@@ -12,7 +12,7 @@ import {
 // const MyCard = ({product_name, product_price, product_image, rating, category}) => { ==> can be destructured like this as well
 const MyCard = ({ product }) => {
   // product = {name: 'xyz', price: '123', image: 'URL}
-  let { product_name, product_price, product_image, rating, category } =
+  let { _id, product_name, product_price, product_image, rating, category } =
     product; // destructuring the object
   return (
     <>
@@ -37,7 +37,9 @@ const MyCard = ({ product }) => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">Share</Button>
+          <Button href={`/product/${_id}`} size="small">
+            View Details
+          </Button>
           <Button size="small">Learn More</Button>
         </CardActions>
       </Card>

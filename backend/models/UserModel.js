@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -20,11 +21,7 @@ const userSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
-    },
-    role: {
-        type: String,
-        required: true
     }
-}, {timestamps: true})
+},{timestamps: true})
 
 module.exports = mongoose.model("User", userSchema)

@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 import { isAuthenticated } from "../api/userApi";
-import { useParams } from "react-router-dom";
 
 const UserContext = createContext();
 

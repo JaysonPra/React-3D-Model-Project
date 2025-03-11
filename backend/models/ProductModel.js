@@ -6,13 +6,17 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
-    }, 
+    },
     product_price: {
         type: Number,
         required: true
     },
     product_description: {
         type: String,
+        required: true
+    },
+    count_in_stock: {
+        type: Number,
         required: true
     },
     rating: {
@@ -24,6 +28,8 @@ const productSchema = new mongoose.Schema({
         ref: "Category"
     },
     product_image: {
-        type:String
-    }}, {timestamps: true}
-)
+        type: String
+    }
+},{timestamps: true})
+
+module.exports = mongoose.model("Product",productSchema)

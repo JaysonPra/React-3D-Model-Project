@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 mongoose.connect(process.env.DATABASE)
-.then(()=>{
-    console.log("Database connected successfully")
+.then(()=> {
+    console.log("Database connected successfully.")
 })
-.catch((error)=>{
+.catch((error)=> {
     console.log(error)
 })

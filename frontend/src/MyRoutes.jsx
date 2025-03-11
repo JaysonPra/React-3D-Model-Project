@@ -24,6 +24,11 @@ import EditProduct from "./Pages/Admin/Products/EditProduct";
 import AdminRoutes from "./ProtectedRoutes/AdminRoutes";
 import ClientRoutes from "./ProtectedRoutes/ClientRoutes";
 import Products from "./Pages/Products";
+import Counter2 from "./redux/Counter2";
+import Games from "./redux/Games";
+import ProductDetails from "./Pages/ProductDetails";
+import Cart from "./Pages/Cart";
+import Checkout from "./Pages/Checkout";
 
 const MyRoutes = () => {
   return (
@@ -44,6 +49,10 @@ const MyRoutes = () => {
           <Route path="/" element={<HomePage />} />
 
           <Route path="/products" element={<Products />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* Admin Page */}
           <Route path="category" element={<Category />} />
@@ -64,6 +73,8 @@ const MyRoutes = () => {
 
         <Route path="/counter" element={<Counter />} />
         <Route path="/verify/:token" element={<VerifyAcc />} />
+        <Route path="/reduxcounter" element={<Counter2 />} />
+        <Route path="/game" element={<Games />} />
       </Routes>
     </BrowserRouter>
   );

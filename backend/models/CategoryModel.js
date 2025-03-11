@@ -6,6 +6,10 @@ const categorySchema = new mongoose.Schema({
         required: true,
         trim: true
     }
-}, {timestamps: true})
+},{timestamps: true})
 
 module.exports = mongoose.model("Category", categorySchema)
+
+// created automatically by mongodb:-
+// _id-> 24 bit hex string -> object id 
+// timestamps -> createdAt, updateAt
