@@ -1,6 +1,6 @@
 const emailSender = require("../middleware/emailSender");
 const UserModel = require("../models/UserModel");
-const TokenModel = require("../models/tokenModel");
+const TokenModel = require("../models/TokenModel");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
@@ -174,7 +174,7 @@ exports.signin = async (req, res) => {
     {
       _id: user._id,
       email,
-      isAdmin: user.isAdmin,
+      isSeller: user.isSeller,
       username: user.username,
     },
     process.env.JWT_SECRET,
@@ -190,7 +190,7 @@ exports.signin = async (req, res) => {
     user: {
       _id: user._id,
       email,
-      isAdmin: user.isAdmin,
+      isSeller: user.isSeller,
       username: user.username,
     },
   });

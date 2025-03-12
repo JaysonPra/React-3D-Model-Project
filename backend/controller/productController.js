@@ -1,4 +1,5 @@
-const productModel = require("../models/productModel");
+const productModel = require("../models/ProductModel");
+
 const fs = require("fs");
 
 // add product
@@ -7,7 +8,6 @@ exports.addProduct = async (req, res) => {
     product_name: req.body.product_name,
     product_price: req.body.product_price,
     product_description: req.body.product_description,
-    count_in_stock: req.body.count_in_stock,
     category: req.body.category,
     product_image: req.file?.path,
   });
@@ -62,26 +62,12 @@ exports.getAllProductsByCategory = async (req, res) => {
 
 // update products
 exports.updateProduct = async (req, res) => {
-  // let productToUpdate = await productModel.findByIdAndUpdate(
-  //     req.params.id,
-  //     {
-  //         product_name: req.body.product_name,
-  //         product_price: req.body.product_price,
-  //         product_description: req.body.product_description,
-  //         count_in_stock: req.body.count_in_stock,
-  //         category: req.body.category,
-  //         rating: req.body.rating
-  //     },
-  //     {new: true}
-  // )
-
   let productToUpdate = await productModel.findById(req.params.id);
 
   let {
     product_name,
     product_price,
     product_description,
-    count_in_stock,
     rating,
     category,
   } = req.body;
@@ -95,9 +81,6 @@ exports.updateProduct = async (req, res) => {
   productToUpdate.product_description = product_description
     ? product_description
     : productToUpdate.product_description;
-  productToUpdate.count_in_stock = count_in_stock
-    ? count_in_stock
-    : productToUpdate.count_in_stock;
   productToUpdate.rating = rating ? rating : productToUpdate.rating;
   productToUpdate.category = category ? category : productToUpdate.category;
 

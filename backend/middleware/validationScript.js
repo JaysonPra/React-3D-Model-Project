@@ -52,10 +52,6 @@ exports.productRules = [
     .notEmpty()
     .isNumeric()
     .withMessage("Price must be a number"),
-  check("count_in_stock", "Count in Stock is required")
-    .notEmpty()
-    .isNumeric()
-    .withMessage("Count must be a number"),
   check("product_description", "Description is required")
     .notEmpty()
     .isLength({ min: 20 })

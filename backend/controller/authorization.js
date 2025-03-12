@@ -9,10 +9,10 @@ exports.isLoggedIn = (req, res, next) => {
   next();
 };
 
-exports.isAdmin = (req, res, next) => {
+exports.isSeller = (req, res, next) => {
   let user = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
-  //console.log(user);
-  if (!user.isAdmin) {
+
+  if (!user.isSeller) {
     return res
       .status(400)
       .json({ error: "YOU MUST BE ADMIN TO ACCESS THIS RESOURCE" });

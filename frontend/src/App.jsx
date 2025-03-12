@@ -16,11 +16,6 @@ import cart_reducer from "./redux/cartReducer";
 export const MyThemeContext = createContext();
 
 function App() {
-  let [theme, setTheme] = useState("light");
-
-  // const store = createStore(counterReducer);
-  // const store = createStore(gameReducer);
-
   const rootReducer = combineReducers({
     counterStore: counterReducer,
     gameStore: gameReducer,
@@ -39,27 +34,15 @@ function App() {
 
   return (
     <>
-      <button
-        className={`fixed top-28 right-10 theme-btn${
-          theme === "light" ? "" : "-dark"
-        }`}
-        onClick={() => {
-          theme === "light" ? setTheme("dark") : setTheme("light");
-        }}
-      >
-        {theme}
-      </button>
-      <MyThemeContext.Provider value={theme}>
-        <UserContextProvider>
-          <MyContextProvider>
-            <Provider store={store}>
-              <PersistGate loading={null} persistor={persistor}>
-                <MyRoutes />
-              </PersistGate>
-            </Provider>
-          </MyContextProvider>
-        </UserContextProvider>
-      </MyThemeContext.Provider>
+      <UserContextProvider>
+        <MyContextProvider>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              <MyRoutes />
+            </PersistGate>
+          </Provider>
+        </MyContextProvider>
+      </UserContextProvider>
     </>
   );
 }

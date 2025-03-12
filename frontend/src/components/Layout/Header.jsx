@@ -1,87 +1,97 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../../api/userApi";
-import UserContext from "../UserContext";
-import MyContext from "../MyContext";
 
-const Header = () => {
-  let { user } = isAuthenticated();
+function Header() {
   const navigate = useNavigate();
+  const auth = isAuthenticated();
+  const [showMenu, setShowMenu] = useState(false);
 
-  let msg = useContext(MyContext);
-  let user1 = useContext(UserContext);
-
-  const handleLogout = (e) => {
+  const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  return (
-    <>
-      <div className="container-fluid bg-dark" style={{ color: "white" }}>
-        <div className="row">
-          <div className="col-12 col-md-3 text-center fs-3 fw-bold py-1">
-            My Page
-          </div>
-          <div className="col-12 col-md-6 text-center">
-            <div className="d-flex btn-group py-2">
-              <input type="search" className="form-control"></input>
-              <input
-                type="button"
-                className="btn btn-success"
-                value={"Search"}
-              ></input>
-            </div>
-          </div>
-          <div className="col-12 col-md-3 text-center d-flex justify-content-evenly fs-3 py-1">
-            {!user ? (
-              <>
-                <Link to={"/registeruser"}>
-                  <i class="bi bi-person-plus"></i>
-                </Link>
-                <Link to={"/login"}>
-                  <i class="bi bi-box-arrow-in-left"></i>
-                </Link>
-              </>
-            ) : user.isAdmin == 1 ? (
-              <>
-                <Link to={"/admin/dashboard"}>
-                  <i className="bi bi-speedometer2"></i>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to={"/cart"}>
-                  <i class="bi bi-cart"></i>
-                </Link>
-              </>
-            )}
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
 
-            {user && (
-              <i
-                className="bi bi-box-arrow-right"
-                role="button"
-                onClick={handleLogout}
-              ></i>
+  return (
+    <div>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark justify-items-center">
+        <div className="container">
+          <Link className="navbar-brand text-info fw-bold" to="/products">
+            3DMart
+          </Link>
+
+          <div className="d-flex align-items-center">
+            <ul className="navbar-nav flex-row me-3">
+              <li className="nav-item px-2">
+                <Link className="nav-link" to="/gallery">
+                  Gallery
+                </Link>
+              </li>
+              <li className="nav-item px-2">
+                <Link className="nav-link" to="/products">
+                  Products
+                </Link>
+              </li>
+              <li className="nav-item px-2">
+                <Link className="nav-link" to="/contact">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+
+            {auth ? (
+              <div className="d-flex align-items-center">
+                <Link to="/cart" className="btn btn-outline-light btn-sm me-2">
+                  <i className="bi bi-cart"></i> Cart
+                </Link>
+
+                {/* Simple menu with state */}
+                <div className="position-relative">
+                  <button
+                    className="btn btn-outline-info btn-sm"
+                    onClick={toggleMenu}
+                  >
+                    {auth.user.username} <i className="bi bi-chevron-down"></i>
+                  </button>
+
+                  {showMenu && (
+                    <div
+                      className="position-absolute end-0 mt-1 bg-white shadow rounded py-1"
+                      style={{ zIndex: 1000, minWidth: "150px" }}
+                    >
+                      {auth.user.isSeller && (
+                        <Link
+                          className="d-block px-3 py-1 text-decoration-none text-dark"
+                          to="/seller/dashboard"
+                        >
+                          Seller Dashboard
+                        </Link>
+                      )}
+                      <div className="dropdown-divider my-1"></div>
+                      <button
+                        className="d-block w-100 text-start border-0 bg-transparent px-3 py-1 text-decoration-none text-dark"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="btn btn-info btn-sm">
+                Login
+              </Link>
             )}
           </div>
         </div>
-      </div>
-      <div className="flex justify-between items-center">
-        <div className="flex justify-evenly py-2 w-[80%]">
-          <Link to={"/"}>Home</Link>
-          <Link to={"/products"}>Products</Link>
-          <Link to={"/about"}>About</Link>
-          <Link to={"/gallery"}>Galley</Link>
-          <Link to={"/services"}>Services</Link>
-          <Link to={"/contact"}>Contact</Link>
-        </div>
-        <div className="pe-2">
-          {msg}, {user1 ? user1.username : "Guest"}
-        </div>
-      </div>
-    </>
+      </nav>
+    </div>
   );
-};
+}
 
 export default Header;

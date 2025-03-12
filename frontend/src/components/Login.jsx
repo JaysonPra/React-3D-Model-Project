@@ -1,106 +1,118 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authenticate, login } from "../api/userApi";
-import { MyThemeContext } from "../App";
 
 const Login = () => {
-  let [user, setUser] = useState({});
-  let navigate = useNavigate();
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  let theme = useContext(MyThemeContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
+    setError(""); // Clear error when user types
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(user).then((data) => {
-      if (data.error) {
-        alert(data.error);
-      } else {
-        authenticate(data);
-        // alert("login successful");
-        if (data.user.isAdmin) {
-          navigate("/admin/dashboard");
+    setLoading(true);
+
+    login(user)
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
         } else {
-          navigate("/");
+          authenticate(data);
+          if (data.user.isSeller) {
+            navigate("/seller/dashboard");
+          } else {
+            navigate("/products");
+          }
         }
-      }
-    });
+      })
+      .catch((err) => {
+        setError("An error occurred. Please try again.");
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <>
-      <main>
-        <form
-          className={`${
-            theme == "dark" ? "dark-" : ""
-          }mybg form-signin w-11/12 sm:w-10/12 lg:w-1/2 m-auto p-5 shadow-xl my-5`}
-        >
-          <img
-            className="mb-4"
-            src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg"
-            alt=""
-            width="72"
-            height="57"
-          />
-          <h1 className="h3 mb-3 fw-normal  ">Please sign in</h1>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6 col-lg-4">
+          <div className="card shadow">
+            <div className="card-body">
+              <h2 className="text-center mb-4">Login to 3DMart</h2>
 
-          <div className="form-floating">
-            <input
-              type="email"
-              className="form-control"
-              id="floatingInput"
-              placeholder="name@example.com"
-              name="email"
-              onChange={handleChange}
-            />
-            <label for="floatingInput">Email address</label>
-          </div>
-          <div className="form-floating">
-            <input
-              type="password"
-              className="form-control"
-              id="floatingPassword"
-              placeholder="Password"
-              name="password"
-              onChange={handleChange}
-            />
-            <label for="floatingPassword">Password</label>
-          </div>
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
 
-          <div className="form-check text-start my-3">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              value="remember-me"
-              id="flexCheckDefault"
-            />
-            <label className="form-check-label" for="flexCheckDefault">
-              Remember me
-            </label>
-          </div>
-          <button
-            className="btn btn-primary w-100 py-2"
-            type="submit"
-            onClick={handleSubmit}
-          >
-            Sign in
-          </button>
-          <div className="flex py-3 justify-between fw-normal mb-3 underline">
-            <Link to={"/register"}>
-              <p>Register an Account?</p>
-            </Link>
-            <Link to={"/forgot"}>
-              <p>Forgot Password</p>
-            </Link>
-          </div>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    name="email"
+                    value={user.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-          <p className="mt-5 mb-3 text-body-secondary">&copy; 2017–2024</p>
-        </form>
-      </main>
-    </>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="password"
+                    name="password"
+                    value={user.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="d-grid gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing in..." : "Login"}
+                  </button>
+                </div>
+              </form>
+
+              <div className="text-center mt-3">
+                <p>
+                  Don't have an account?{" "}
+                  <Link to="/registeruser">Register here</Link>
+                </p>
+                <p>
+                  <Link to="/forgetpassword">Forgot your password?</Link>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
