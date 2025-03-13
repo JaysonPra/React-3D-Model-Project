@@ -3,22 +3,20 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: false, // true for port 465, false for other ports
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
 
-// async..await is not allowed in global scope, must use a wrapper
 async function emailSender(mailOptions) {
-  // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: mailOptions.from, // sender address
-    to: mailOptions.to, // list of receivers
-    subject: mailOptions.subject, // Subject line
-    text: mailOptions.text, // plain text body
-    html: mailOptions.html, // html body
+    from: mailOptions.from,
+    to: mailOptions.to,
+    subject: mailOptions.subject,
+    text: mailOptions.text,
+    html: mailOptions.html, 
   });
 
   console.log("Message sent: %s", info.messageId);
