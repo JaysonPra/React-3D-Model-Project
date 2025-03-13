@@ -48,7 +48,7 @@ const CategoryCheckbox = ({ handleFilter }) => {
   return (
     <Box p={3}>
       <Typography variant="h5" color="white" gutterBottom>
-        Departments
+        Categories
       </Typography>
 
       {loading ? (
