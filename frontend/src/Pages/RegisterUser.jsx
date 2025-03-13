@@ -26,7 +26,6 @@ const Register = () => {
     setError("");
     setSuccess("");
 
-    // Validate passwords match
     if (user.password !== user.confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);

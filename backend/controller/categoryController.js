@@ -10,11 +10,9 @@ exports.addCategory = async (req, res) => {
         return res.status(400).json({error:"Category Already Exists"})
     }
 
-
     let categoryToAdd = await Category.create({
         category_name: req.body.category_name
     })
-
 
     if(!categoryToAdd){
         return res.status(400).json({error:"Something went wrong"})

@@ -6,9 +6,18 @@ import { addProduct } from "../../../api/productApi";
 import { isAuthenticated } from "../../../api/userApi";
 
 const AddProduct = () => {
-  let [product, setProduct] = useState({});
-  let [categories, setCategories] = useState([]);
+  const [product, setProduct] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { token } = isAuthenticated();
+
+  // Dark theme configuration for SweetAlert2
+  const darkSwal = Swal.mixin({
+    background: "#212529",
+    color: "#fff",
+    confirmButtonColor: "#0d6efd",
+    cancelButtonColor: "#6c757d",
+  });
 
   useEffect(() => {
     getAllCategories()
@@ -32,122 +41,181 @@ const AddProduct = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     let formdata = new FormData();
     for (var key in product) {
       formdata.append(key, product[key]);
-      console.log(key, product[key]);
     }
 
-    addProduct(formdata, token).then((data) => {
-      if (data.error) {
-        alert(data.error);
-      } else {
-        Swal.fire({
-          title: "Congrats",
-          text: "Product added successfully.",
-          icon: "success",
+    addProduct(formdata, token)
+      .then((data) => {
+        setLoading(false);
+        if (data.error) {
+          darkSwal.fire({
+            title: "Error",
+            text: data.error,
+            icon: "error",
+            timer: 3000,
+            timerProgressBar: true,
+          });
+        } else {
+          darkSwal.fire({
+            title: "Success",
+            text: "Product added successfully.",
+            icon: "success",
+            timer: 3000,
+            timerProgressBar: true,
+          });
+          // Reset form
+          setProduct({});
+          document.getElementById("product-form").reset();
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        darkSwal.fire({
+          title: "Error",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
           timer: 3000,
-          timeProgressBar: true,
+          timerProgressBar: true,
         });
-      }
-    });
+      });
   };
+
   return (
-    <main className="form-signin w-11/12 sm:w-10/12  md:w-8/12 lg:w-1/2 m-auto p-5 shadow-xl bg-purple-900 my-5">
-      <form style={{ maxWidth: "400px", margin: "auto" }}>
-        <h2 className="text-2xl text-center font-bold underline my-2">
-          Add Product
-        </h2>
+    <div className="container py-4">
+      <div className="row justify-content-center">
+        <div className="col-md-8 col-lg-6">
+          <div className="card bg-dark text-white border-secondary shadow">
+            <div className="card-header bg-dark text-white border-secondary">
+              <h3 className="text-center mb-0">Add New Product</h3>
+            </div>
+            <div className="card-body">
+              <form id="product-form" onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label htmlFor="product_name" className="form-label">
+                    Product Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control bg-dark text-light border-secondary"
+                    id="product_name"
+                    name="product_name"
+                    placeholder="Enter product name"
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
 
-        <label>Product Name:</label>
-        <input
-          type="text"
-          className="w-full text-blue-700 px-5 py-2 border border-blue-900 focus:bg-gray-100"
-          name="product_name"
-          placeholder="Enter product name"
-          required
-          onChange={handleChange}
-        />
-        <br />
+                <div className="mb-3">
+                  <label htmlFor="product_price" className="form-label">
+                    Price
+                  </label>
+                  <div className="input-group">
+                    <span className="input-group-text bg-dark text-light border-secondary">
+                      Rs.
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="form-control bg-dark text-light border-secondary"
+                      id="product_price"
+                      name="product_price"
+                      placeholder="0.00"
+                      required
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
 
-        <label>Price:</label>
-        <input
-          type="text"
-          className="w-full text-blue-700 px-5 py-2 border border-blue-900 focus:bg-gray-100"
-          name="product_price"
-          placeholder="Enter price"
-          required
-          onChange={handleChange}
-        />
-        <br />
+                <div className="mb-3">
+                  <label htmlFor="product_description" className="form-label">
+                    Description
+                  </label>
+                  <textarea
+                    className="form-control bg-dark text-light border-secondary"
+                    id="product_description"
+                    name="product_description"
+                    rows="4"
+                    placeholder="Enter product description"
+                    required
+                    onChange={handleChange}
+                  ></textarea>
+                </div>
 
-        <label>Description:</label>
-        <textarea
-          rows={5}
-          className="w-full text-blue-700 px-5 py-2 border border-blue-900 focus:bg-gray-100 resize-none"
-          name="product_description"
-          placeholder="Enter description"
-          required
-          onChange={handleChange}
-        />
-        <br />
+                <div className="mb-3">
+                  <label htmlFor="category" className="form-label">
+                    Category
+                  </label>
+                  <select
+                    className="form-select bg-dark text-light border-secondary"
+                    id="category"
+                    name="category"
+                    required
+                    onChange={handleChange}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Select Category
+                    </option>
+                    {categories.length > 0 &&
+                      categories.map((category) => (
+                        <option key={category._id} value={category._id}>
+                          {category.category_name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
 
-        <label>Category:</label>
-        <select
-          name="category"
-          required
-          className="w-full text-blue-700 px-5 py-2 border border-blue-900 focus:bg-gray-100"
-          defaultValue={""}
-          onChange={handleChange}
-        >
-          <option value="" disabled selected>
-            Select Category
-          </option>
-          {categories.length > 0 &&
-            categories.map((category) => {
-              return (
-                <option key={category._id} value={category._id}>
-                  {category.category_name}
-                </option>
-              );
-            })}
-        </select>
-        <br />
+                <div className="mb-4">
+                  <label htmlFor="product_image" className="form-label">
+                    Product Image
+                  </label>
+                  <input
+                    type="file"
+                    className="form-control bg-dark text-light border-secondary"
+                    id="product_image"
+                    name="product_image"
+                    accept="image/*"
+                    required
+                    onChange={handleFileChange}
+                  />
+                </div>
 
-        <label>Count:</label>
-        <input
-          type="number"
-          className="w-full text-blue-700 px-5 py-2 border border-blue-900 focus:bg-gray-100"
-          name="count_in_stock"
-          placeholder="Enter count"
-          required
-          onChange={handleChange}
-        />
-        <br />
-
-        <label>Image:</label>
-        <input
-          type="file"
-          className="w-full text-orange-300 px-5 py-2 border border-blue-900 focus:bg-gray-100"
-          name="product_image"
-          accept="image/*"
-          required
-          onChange={handleFileChange}
-        />
-        <br />
-
-        <button className="btn btn-danger w-50 mt-2 p-2" onClick={handleSubmit}>
-          Add Product
-        </button>
-        <Link
-          to={"/admin/products"}
-          className="btn btn-warning w-50 flex mt-2 p-2 text-black"
-        >
-          Go Back
-        </Link>
-      </form>
-    </main>
+                <div className="d-grid gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Adding Product...
+                      </>
+                    ) : (
+                      "Add Product"
+                    )}
+                  </button>
+                  <Link
+                    to="/seller/products"
+                    className="btn btn-outline-secondary"
+                  >
+                    Cancel
+                  </Link>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

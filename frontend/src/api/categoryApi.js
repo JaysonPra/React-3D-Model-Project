@@ -12,7 +12,6 @@ export const getCategoryDetails = (id) => {
 };
 
 export const addCategory = (category_name) => {
-  //{"category_name" : "test_category"}
   let category = { category_name };
   return fetch(`${API}/addcategory`, {
     method: "POST",
@@ -26,7 +25,7 @@ export const addCategory = (category_name) => {
     .catch((error) => console.log(error));
 };
 export const editCategory = (id, category_name) => {
-  // {"category_name": "test category"}
+
   let category = { category_name };
   return fetch(`${API}/updatecategory/${id}`, {
     method: "PUT",
@@ -40,7 +39,7 @@ export const editCategory = (id, category_name) => {
 };
 
 export const deleteCategory = (id) => {
-  // {"category_name": "test category"}
+
   return fetch(`${API}/deletecategory/${id}`, {
     method: "DELETE",
   })

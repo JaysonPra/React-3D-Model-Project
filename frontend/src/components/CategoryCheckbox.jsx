@@ -5,63 +5,77 @@ import {
   FormControlLabel,
   FormGroup,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { getAllCategories } from "../api/categoryApi";
 
 const CategoryCheckbox = ({ handleFilter }) => {
-  let [categories, setCategories] = useState([]);
-  let [selected, setSelected] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAllCategories().then((data) => {
-      if (data.error) {
-        console.log(data.error);
-      } else {
-        setCategories(data);
-      }
-    });
+    getAllCategories()
+      .then((data) => {
+        if (data.error) {
+          console.error(data.error);
+        } else {
+          setCategories(data);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   const handleChange = (e) => {
-    let newSelected = selected;
-    let newCategory = e.target.value;
+    const categoryId = e.target.value;
+    const updatedSelected = [...selected];
 
-    let categoryExists = newSelected.findIndex((item) => item === newCategory);
-
-    if (categoryExists != -1) {
-      newSelected.splice(categoryExists, 1);
+    const index = updatedSelected.indexOf(categoryId);
+    if (index !== -1) {
+      updatedSelected.splice(index, 1);
     } else {
-      newSelected.push(newCategory);
+      updatedSelected.push(categoryId);
     }
-    setSelected(newSelected);
-    handleFilter("category", newSelected);
+
+    setSelected(updatedSelected);
+    handleFilter("category", updatedSelected);
   };
 
   return (
     <Box p={3}>
-      <Typography variant="h4" color="white">
+      <Typography variant="h5" color="white" gutterBottom>
         Departments
       </Typography>
-      <FormGroup className="text-white">
-        {categories.length > 0 &&
-          categories.map((category) => {
-            return (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    icon={<i className="bi bi-bookmark text-white"></i>}
-                    checkedIcon={
-                      <i className="bi bi-bookmark-check-fill text-white"></i>
-                    }
-                    value={category._id}
-                    onChange={handleChange}
-                  />
-                }
-                label={category.category_name}
-              ></FormControlLabel>
-            );
-          })}
-      </FormGroup>
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" my={2}>
+          <CircularProgress size={24} color="secondary" />
+        </Box>
+      ) : (
+        <FormGroup>
+          {categories.map((category) => (
+            <FormControlLabel
+              key={category._id}
+              control={
+                <Checkbox
+                  icon={<i className="bi bi-tag text-white"></i>}
+                  checkedIcon={<i className="bi bi-tag-fill text-white"></i>}
+                  value={category._id}
+                  onChange={handleChange}
+                  checked={selected.includes(category._id)}
+                />
+              }
+              label={
+                <span style={{ color: "white" }}>{category.category_name}</span>
+              }
+            />
+          ))}
+        </FormGroup>
+      )}
     </Box>
   );
 };

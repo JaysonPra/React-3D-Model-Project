@@ -2,53 +2,63 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getProductDetails } from "../api/productApi";
 import { API } from "../consts";
-import { Button } from "@mui/material";
+import {
+  Button,
+  Container,
+  Grid,
+  Typography,
+  Box,
+  Paper,
+  Rating,
+  Divider,
+  Chip,
+  Skeleton,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 const ProductDetails = () => {
   let [product, setProduct] = useState({});
-  let [qty, setQty] = useState(1);
+  let [loading, setLoading] = useState(true);
 
   const { id } = useParams();
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setLoading(true);
     getProductDetails(id).then((data) => {
       if (data.error) {
         console.log(data.error);
       } else {
         setProduct(data);
+        setLoading(false);
       }
     });
-  }, []);
+  }, [id]);
 
   let cart_items = useSelector((store) => store.cartStore.cart_items);
+
   const handleAddToCart = (e) => {
     e.preventDefault();
 
     let itemExists = cart_items.find((item) => item.id == id);
     if (itemExists) {
-      let new_quantity = Number(itemExists.quantity) + Number(qty);
-      if (new_quantity > itemExists.stock) {
-        Swal.fire("Attention!!!", "Quantity is out of Stock", "warning");
-      } else {
-        let cart_item = {
-          ...itemExists,
-          quantity: new_quantity,
-        };
+      let cart_item = {
+        ...itemExists,
+        quantity: 1,
+      };
 
-        dispatch({ type: "UPDATE_CART", payload: cart_item });
-        Swal.fire("Congrats!!", "Quantity updated in Cart", "success");
-      }
+      dispatch({ type: "UPDATE_CART", payload: cart_item });
+      Swal.fire("Congrats!!", "Item updated in Cart", "success");
     } else {
       let cart_item = {
         id: product._id,
         name: product.product_name,
         price: product.product_price,
         image: product.product_image,
-        stock: product.count_in_stock,
-        quantity: qty,
+        quantity: 1,
       };
       dispatch({
         type: "ADD_TO_CART",
@@ -58,40 +68,131 @@ const ProductDetails = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" height={400} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="text" height={60} sx={{ mb: 2 }} />
+            <Skeleton variant="text" height={40} sx={{ mb: 2 }} />
+            <Skeleton variant="text" height={120} sx={{ mb: 2 }} />
+            <Skeleton variant="text" height={40} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" width={150} height={50} />
+          </Grid>
+        </Grid>
+      </Container>
+    );
+  }
+
   return (
-    <div className="bg-slate-600 p-10 flex">
-      <div className="w-1/2">
-        <img
-          src={`${API}/${product.product_image}`}
-          alt=""
-          className="w-full"
-        />
-      </div>
-      <div className="w-1/2 p-20">
-        <h1 className="text-3xl">{product.product_name}</h1>
-        <h1 className="text-2xl">Price: Rs. {product.product_price}</h1>
-        <h1 className="text-2xl">Description: </h1>
-        <p className="text-xl">{product.product_description}</p>
-        <h1 className="text-2xl">In Stock: {product.count_in_stock}</h1>
-        <h1 className="text-2xl">Rating: {product.rating}</h1>
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Paper elevation={3} sx={{ overflow: "hidden" }}>
+        <Grid container>
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "grey.100",
+                p: 2,
+              }}
+            >
+              <img
+                src={`${API}/${product.product_image}`}
+                alt={product.product_name}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "400px",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+          </Grid>
 
-        <h1 className="text-2xl">Quantity: </h1>
-        <input
-          type="number"
-          min={1}
-          max={product.count_in_stock}
-          onChange={(e) => setQty(e.target.value)}
-          defaultValue={1}
-          className="text-xl text-center"
-        />
+          <Grid item xs={12} md={6}>
+            <Box sx={{ p: 4 }}>
+              <Typography
+                variant="h4"
+                component="h1"
+                gutterBottom
+                fontWeight="bold"
+              >
+                {product.product_name}
+              </Typography>
 
-        <br />
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Rating value={product.rating || 0} readOnly precision={0.5} />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ ml: 1 }}
+                >
+                  {product.rating} rating
+                </Typography>
+              </Box>
 
-        <Button variant="contained" className="btn" onClick={handleAddToCart}>
-          Add To Cart
-        </Button>
-      </div>
-    </div>
+              <Typography
+                variant="h5"
+                color="primary"
+                fontWeight="medium"
+                sx={{ mb: 2 }}
+              >
+                Rs. {product.product_price?.toLocaleString()}
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="h6" gutterBottom>
+                Description
+              </Typography>
+              <Typography variant="body1" paragraph>
+                {product.product_description}
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                <LocalShippingIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Free shipping on orders over Rs. 1000
+                </Typography>
+              </Box>
+
+              {product.category && (
+                <Chip
+                  label={product.category.category_name}
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 3 }}
+                />
+              )}
+
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleAddToCart}
+                startIcon={<ShoppingCartIcon />}
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                }}
+              >
+                Add to Cart
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+    </Container>
   );
 };
 
