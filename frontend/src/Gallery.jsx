@@ -31,7 +31,7 @@ const Gallery = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ py: 6 }}>
+    <Container maxWidth="2xl" sx={{ py: 6 }}>
       <Typography
         variant="h4"
         component="h1"
